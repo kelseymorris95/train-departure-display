@@ -56,7 +56,7 @@ def loadConfig():
     data["journey"]["screen1Platform"] = parsePlatformData(os.getenv("screen1Platform"))
     data["journey"]["screen2Platform"] = parsePlatformData(os.getenv("screen2Platform"))
 
-    data["api"]["apiKey"] = os.getenv("apiKey") or None
+    data["api"]["apiKey"] = "caa71241-3dc8-491f-8487-cea8a3c6e2f8"
     data["api"]["operatingHours"] = os.getenv("operatingHours") or ""
 
     data["showDepartureNumbers"] = False

@@ -3,7 +3,8 @@ import time
 from opensign import OpenSign
 from opensign.canvas import OpenSignCanvas
 
-
+# This is now working, sudo python demo.py.
+# TODO: Make this work with train API stuff.
 def main():
     message1 = OpenSignCanvas()
     message1.add_font("dejavu", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
