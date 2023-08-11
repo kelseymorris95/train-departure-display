@@ -2,6 +2,7 @@ import os
 import time
 
 import requests
+import time
 
 from datetime import datetime
 from PIL import ImageFont, Image, ImageDraw
@@ -9,6 +10,9 @@ from PIL import ImageFont, Image, ImageDraw
 from trains import loadDeparturesForStation
 from config import loadConfig
 from open import isRun
+
+from opensign import OpenSign
+from opensign.canvas import OpenSignCanvas
 
 
 import socket, re, uuid
@@ -408,6 +412,17 @@ try:
     config = loadConfig()
     data = loadData(config["api"], config["journey"], config)
     print(data)
+    message = OpenSignCanvas()
+    #message.add_font("dejavu", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+    message.add_font(
+        "comic", "/usr/share/fonts/truetype/msttcorefonts/Comic_Sans_MS.ttf", 24
+    )
+    message.set_stroke(1, (255, 255, 255))
+    message.add_text(data[0][0]["aimed_departure_time"] + " " + data[0][0]["destination_name"], color=(255, 255, 255))
+    message.set_shadow()
+    sign = OpenSign(rows=32, columns=64, chain=2, gpio_mapping='adafruit-hat')
+    sign.show(message)
+    time.sleep(10)
 
 
 # try:
@@ -508,9 +523,11 @@ try:
 #                 if config['dualScreen']:
 #                     virtual1.refresh()
 
-# except KeyboardInterrupt:
-#     pass
-# except ValueError as err:
-#     print(f"Error: {err}")
+except KeyboardInterrupt:
+    pass
+except ValueError as err:
+    print(f"Error: {err}")
 # # except KeyError as err:
 # #     print(f"Error: Please ensure the {err} environment variable is set")
+
+
