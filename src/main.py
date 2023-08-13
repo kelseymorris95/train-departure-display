@@ -413,14 +413,14 @@ try:
     data = loadData(config["api"], config["journey"], config)
     print(data)
     message = OpenSignCanvas()
-    #message.add_font("dejavu", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-    message.add_font(
-        "comic", "/usr/share/fonts/truetype/msttcorefonts/Comic_Sans_MS.ttf", 24
-    )
-    message.set_stroke(1, (255, 255, 255))
-    message.add_text(data[0][0]["aimed_departure_time"] + " " + data[0][0]["destination_name"], color=(255, 255, 255))
+    message.add_font("dejavu", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 10)
+    #message.add_font(
+    #    "comic", "/usr/share/fonts/truetype/msttcorefonts/Comic_Sans_MS.ttf", 24
+    #)
+    #message.set_stroke(1, (255, 255, 255))
+    message.add_text(data[0][0]["aimed_departure_time"] + " " + data[0][0]["destination_name"], color=(254,218,5))
     message.set_shadow()
-    sign = OpenSign(rows=32, columns=64, chain=2, gpio_mapping='adafruit-hat')
+    sign = OpenSign(rows=32, columns=64, chain=2, gpio_mapping='adafruit-hat', slowdown_gpio=4)
     sign.show(message)
     time.sleep(10)
 
