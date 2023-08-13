@@ -1,31 +1,29 @@
 import os
-import time
-
 import requests
 import time
+import socket
+import re
+import uuid
 
-from datetime import datetime
-from PIL import ImageFont, Image, ImageDraw
-
-from trains import loadDeparturesForStation
 from config import loadConfig
+from datetime import datetime
 from open import isRun
-
 from opensign import OpenSign
 from opensign.canvas import OpenSignCanvas
+from trains import loadDeparturesForStation
+from PIL import ImageFont, Image, ImageDraw
 
 
-import socket, re, uuid
-
+maxLineLength = 25
 
 def formatTime(timeString):
     # Format as 00:00
-    return f"{timeString}".ljust(5, "0")
+    return f"{timeString}".rjust(5, "0")
 
 
-def formatCurrentTime(draw, width, *_):
+def formatCurrentTime():
     rawTime = datetime.now().time()
-    hour, minute = str(rawTime).split('.')[0].split(':')
+    hour, minute, _ = str(rawTime).split(':')
     return formatTime(f"{hour}:{minute}")
 
 
@@ -55,24 +53,22 @@ def loadData(apiConfig, journeyConfig, config):
         return False, False, journeyConfig['outOfHoursName']
 
 
+# Board is 25.5 chars wide at this font size.
 def buildDepartureLine(destinationName, aimedDepartureTime, expectedDepartureTime):
-    # TODO: Use a monospace font so this always lines up.
-    lineLength = 30
+    delayed = expectedDepartureTime != "On time"
+    destinationNameMaxLength = 9 if delayed else 19
 
-    destinationNameMaxLength = 14
     destinationNameTruncated = destinationName[:destinationNameMaxLength]
     destinationNamePadded = destinationNameTruncated.rjust(destinationNameMaxLength, " ")
-    print(destinationNamePadded)
 
     # Format as 00:00
-    departureTimeMaxLength = 5
     aimedDepartureTimePadded = formatTime(aimedDepartureTime)
     expectedDepartureTimePadded = formatTime(expectedDepartureTime) 
-    print(aimedDepartureTimePadded)
-    print(expectedDepartureTimePadded)
 
-    print(f"{aimedDepartureTimePadded} {destinationNamePadded} Exp {expectedDepartureTimePadded}")
-    return f"{aimedDepartureTimePadded} {destinationNamePadded} Exp {expectedDepartureTimePadded}"
+    if delayed:
+        return f"{aimedDepartureTimePadded} {destinationNamePadded} Exp {expectedDepartureTimePadded}"
+    
+    return f"{aimedDepartureTimePadded} {destinationNamePadded}"
 
 
 def buildText(departureData):
@@ -104,28 +100,26 @@ def buildText(departureData):
             secondDeparture["aimed_departure_time"], 
             secondDeparture["expected_departure_time"])
 
-    currentTime = formatCurrentTime
+    currentTime = formatCurrentTime().center(maxLineLength)
 
     return f"{firstDepartureLine}\n{secondDepartureLine}\n{currentTime}"
 
 
 def renderSign(departureData, sign):
     message = OpenSignCanvas()
-    message.add_font("dejavu", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 10)
-    message.add_text(buildText(data), color=(254,218,5))
-    message.set_shadow()
+    message.opacity = .5
+    message.add_font("monospace", "./fonts/VeraMono.ttf", 9)
+    message.add_text(buildText(data), color=(252, 177, 0))
     sign.show(message)
 
 
 try:
-    print('Starting Train Departure Display v')
     config = loadConfig()
     sign = OpenSign(rows=32, columns=64, chain=2, gpio_mapping='adafruit-hat', slowdown_gpio=4)
     while True:
         data = loadData(config["api"], config["journey"], config)
-        print(data)
         renderSign(data, sign)
-        time.sleep(60)
+        time.sleep(15)
 
 
 
