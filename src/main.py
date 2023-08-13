@@ -112,13 +112,22 @@ def renderSign(departureData, sign):
     message.add_text(buildText(data), color=(252, 177, 0))
     sign.show(message)
 
+def renderException():
+    message = OpenSignCanvas()
+    message.opacity = .5
+    message.add_font("monospace", "./fonts/VeraMono.ttf", 9)
+    message.add_text("Error :(", color=(252, 177, 0))
+    sign.show(message)
 
 try:
     config = loadConfig()
     sign = OpenSign(rows=32, columns=64, chain=2, gpio_mapping='adafruit-hat', slowdown_gpio=4)
     while True:
         data = loadData(config["api"], config["journey"], config)
-        renderSign(data, sign)
+        try:
+            renderSign(data, sign)
+        except Exception as e:
+            renderException() 
         time.sleep(15)
 
 
