@@ -20,7 +20,7 @@ import socket, re, uuid
 
 def formatTime(timeString):
     # Format as 00:00
-    return f"{hour}:{minute}".ljust(5, "0")
+    return f"{timeString}".ljust(5, "0")
 
 
 def formatCurrentTime(draw, width, *_):
@@ -71,12 +71,12 @@ def buildDepartureLine(destinationName, aimedDepartureTime, expectedDepartureTim
     print(aimedDepartureTimePadded)
     print(expectedDepartureTimePadded)
 
-    print(f"{aimedDepartureTimePadded destinationNamePadded Exp expectedDepartureTimePadded}")
-    return f"{aimedDepartureTimePadded destinationNamePadded Exp expectedDepartureTimePadded}"
+    print(f"{aimedDepartureTimePadded} {destinationNamePadded} Exp {expectedDepartureTimePadded}")
+    return f"{aimedDepartureTimePadded} {destinationNamePadded} Exp {expectedDepartureTimePadded}"
 
 
 def buildText(departureData):
-    if(len(departureData) == 0)
+    if len(departureData) == 0:
         return "No departure data"
 
     departureList = departureData[0]
@@ -84,7 +84,7 @@ def buildText(departureData):
     filterToStations = ("Blackfriars", "London Bridge")
     for departure in departureList:
         for station in filterToStations:
-            if departure["calling_at_list"] contains station:
+            if station in departure["calling_at_list"]:
                 filteredDepartureList.append(departure)
                 break
 
@@ -97,7 +97,7 @@ def buildText(departureData):
             firstDeparture["expected_departure_time"])
 
     secondDepartureLine = ""
-    if len(filteredDepartureList > 1):
+    if len(filteredDepartureList) > 1:
         secondDeparture = filteredDepartureList[1]
         secondDepartureLine = buildDepartureLine(
             secondDeparture["destination_name"], 
@@ -121,7 +121,7 @@ try:
     print('Starting Train Departure Display v')
     config = loadConfig()
     sign = OpenSign(rows=32, columns=64, chain=2, gpio_mapping='adafruit-hat', slowdown_gpio=4)
-    while true:
+    while True:
         data = loadData(config["api"], config["journey"], config)
         print(data)
         renderSign(data, sign)
